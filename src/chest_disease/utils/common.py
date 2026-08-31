@@ -6,14 +6,20 @@ from pathlib import Path
 
 
 class ConfigBox(dict):
-    """Dictionary subclass that allows attribute-style dot-notation access."""
+    """Dictionary subclass enabling dot-notation access for nested keys."""
+
+    def __init__(self, dictionary=None):
+        super().__init__()
+        if dictionary:
+            for key, value in dictionary.items():
+                if isinstance(value, dict):
+                    self[key] = ConfigBox(value)
+                else:
+                    self[key] = value
 
     def __getattr__(self, key):
         try:
-            value = self[key]
-            if isinstance(value, dict):
-                return ConfigBox(value)
-            return value
+            return self[key]
         except KeyError:
             raise AttributeError(f"'ConfigBox' object has no attribute '{key}'")
 
@@ -21,14 +27,14 @@ class ConfigBox(dict):
         self[key] = value
 
 
-def read_yaml(path_to_yaml: Path) -> dict:
-    """Reads a YAML file and returns a standard dictionary"""
+def read_yaml(path_to_yaml: Path) -> ConfigBox:
+    """Reads a YAML file and wraps it in a ConfigBox object."""
     try:
-        with open(path_to_yaml) as yaml_file:
+        with open(path_to_yaml, "r") as yaml_file:
             content = yaml.safe_load(yaml_file)
-            if content is None:
-                raise ValueError("yaml file is empty")
-            return content
+            if not content:
+                raise ValueError("YAML file is empty")
+            return ConfigBox(content)
     except Exception as e:
         raise e
 
