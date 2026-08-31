@@ -1,3 +1,9 @@
+import sys
+from pathlib import Path
+
+# Add project root and src directory to sys.path
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
+
 from chest_disease.config.configuration import ConfigurationManager
 from chest_disease.components.data_ingestion import DataIngestion
 
