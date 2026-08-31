@@ -1,0 +1,14 @@
+torch
+torchvision
+torchaudio
+pandas
+numpy
+pillow
+gdown
+dvc
+mlflow
+flask
+python-box
+pyyaml
+ensure
+notebook

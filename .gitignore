@@ -1,0 +1,4 @@
+chest-disease-pytorch/venv/
+.venv/
+__pycache__/
+*.pyc
