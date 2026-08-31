@@ -14,7 +14,7 @@ class DataIngestion:
         if not os.path.exists(self.config.local_data_file):
             logger.info(f"Downloading data from {self.config.source_URL}")
             gdown.download(
-                self.config.source_URL, self.config.local_data_file, quiet=False
+                self.config.source_URL, str(self.config.local_data_file), quiet=False
             )
             logger.info(f"Downloaded data to {self.config.local_data_file}")
         else:
