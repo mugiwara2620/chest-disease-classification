@@ -1,4 +1,6 @@
 import os
+import zipfile
+import gdown
 from roboflow import Roboflow
 from chest_disease.entity.config_entity import DataIngestionConfig
 from chest_disease import logger
@@ -27,3 +29,11 @@ class DataIngestion:
             logger.info(f"Dataset downloaded successfully to {target_dir}")
         else:
             logger.info("Dataset already exists locally.")
+
+    def extract_zip_file(self):
+        """Extracts the downloaded zip file to the target artifacts directory."""
+        unzip_path = self.config.unzip_dir
+        os.makedirs(unzip_path, exist_ok=True)
+        with zipfile.ZipFile(self.config.local_data_file, "r") as zip_ref:
+            zip_ref.extractall(unzip_path)
+        logger.info(f"Extracted dataset to {unzip_path}")
