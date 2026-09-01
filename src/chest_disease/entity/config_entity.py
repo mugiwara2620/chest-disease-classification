@@ -5,9 +5,10 @@ from pathlib import Path
 @dataclass(frozen=True)
 class DataIngestionConfig:
     root_dir: Path
-    source_URL: str
-    local_data_file: Path
     unzip_dir: Path
+    workspace: str
+    project: str
+    version: int
 
 
 @dataclass(frozen=True)
