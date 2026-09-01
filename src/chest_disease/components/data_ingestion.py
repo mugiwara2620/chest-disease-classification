@@ -1,6 +1,5 @@
 import os
-import zipfile
-import gdown
+from pathlib import Path
 from roboflow import Roboflow
 from chest_disease.entity.config_entity import DataIngestionConfig
 from chest_disease import logger
@@ -11,29 +10,21 @@ class DataIngestion:
         self.config = config
 
     def download_file(self):
-        """Downloads the dataset directly from Roboflow using the Roboflow Python API."""
-        target_dir = str(self.config.unzip_dir)
+        # Resolve path as an absolute path string
+        target_dir = str(Path(self.config.unzip_dir).resolve())
+        os.makedirs(target_dir, exist_ok=True)
 
-        if not os.path.exists(target_dir) or len(os.listdir(target_dir)) == 0:
-            logger.info("Downloading dataset from Roboflow...")
+        logger.info(f"Target dataset directory: {target_dir}")
 
-            # Retrieve API key from environment variables for security
-            api_key = os.getenv("ROBOFLOW_API_KEY", "YOUR_ROBOFLOW_API_KEY")
+        api_key = os.getenv("ROBOFLOW_API_KEY")
+        if not api_key:
+            raise ValueError("ROBOFLOW_API_KEY environment variable is missing!")
 
-            rf = Roboflow(api_key=api_key)
-            project = rf.workspace(self.config.workspace).project(self.config.project)
-            dataset = project.version(self.config.version).download(
-                "folder", location=target_dir
-            )
+        rf = Roboflow(api_key=api_key)
+        project = rf.workspace(self.config.workspace).project(self.config.project)
 
-            logger.info(f"Dataset downloaded successfully to {target_dir}")
-        else:
-            logger.info("Dataset already exists locally.")
+        # Download dataset
+        version = project.version(self.config.version)
+        dataset = version.download(model_format="folder", location=target_dir)
 
-    # def extract_zip_file(self):
-    #     """Extracts the downloaded zip file to the target artifacts directory."""
-    #     unzip_path = self.config.unzip_dir
-    #     os.makedirs(unzip_path, exist_ok=True)
-    #     with zipfile.ZipFile(self.config.local_data_file, "r") as zip_ref:
-    #         zip_ref.extractall(unzip_path)
-    #     logger.info(f"Extracted dataset to {unzip_path}")
+        logger.info(f"Dataset successfully downloaded to: {dataset.location}")
